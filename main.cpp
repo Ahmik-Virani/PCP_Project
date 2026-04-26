@@ -8,6 +8,9 @@ using namespace std::chrono; // Added for cleaner timing code
 #include "./GM_VARIANTS/GM_greedy_lockfree.cpp"
 #include "./GM_VARIANTS/GM_iterative.cpp"
 #include "./GM_VARIANTS/GM_iterative_csr.cpp"
+#include "./JP_VARIANTS/JP_classic.cpp"
+#include "./JP_VARIANTS/JP_optimized_csr.cpp"
+#include "./JP_VARIANTS/JP_persistent_csr.cpp"
 #include "greedyColoring.cpp"
 #include "welshPowelColoring.cpp"
 #include "mColoring.cpp"
@@ -85,6 +88,30 @@ int main(){
     GM_iterative_csr GM_csr_approach(adj, p);
     stop = steady_clock::now();
     cout << "The number of colors: " << GM_csr_approach.getNoOfColors() << "\n";
+    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
+
+    for(int i = 0 ; i < 30 ; i++) cout << "*";
+    cout << "\nRUNNING THE CLASSIC JP ALGORITHM\n";
+    start = steady_clock::now();
+    JP_classic JP_approach(adj, p);
+    stop = steady_clock::now();
+    cout << "The number of colors: " << JP_approach.getNoOfColors() << "\n";
+    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
+
+    for(int i = 0 ; i < 30 ; i++) cout << "*";
+    cout << "\nRUNNING THE OPTIMIZED JP ALGORITHM WITH CSR\n";
+    start = steady_clock::now();
+    JP_optimized_csr JP_csr_approach(adj, p);
+    stop = steady_clock::now();
+    cout << "The number of colors: " << JP_csr_approach.getNoOfColors() << "\n";
+    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
+
+    for(int i = 0 ; i < 30 ; i++) cout << "*";
+    cout << "\nRUNNING THE PERSISTENT JP ALGORITHM WITH CSR\n";
+    start = steady_clock::now();
+    JP_persistent_csr JP_persistent_csr_approach(adj, p);
+    stop = steady_clock::now();
+    cout << "The number of colors: " << JP_persistent_csr_approach.getNoOfColors() << "\n";
     cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
 
     return 0;
