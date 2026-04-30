@@ -27,6 +27,9 @@ using namespace chrono;
 #include "IterativeCSR/GM_sequential.cpp"
 
 #include "Novel/GM_random_Phase1.cpp"
+#include "Novel/edgeLock_Naive.cpp"
+#include "Novel/edgeLock_Portable.cpp"
+#include "Novel/edgeLock_CSR.cpp"
 
 struct AlgorithmResult {
     int colorCount;
@@ -81,34 +84,34 @@ int main() {
             greedyColoring alg(adj);
             return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
         }},
-        {"THE WELSH POWEL COLORING ALGORITHM", [&]() {
-            welshPowelColoring alg(adj);
-            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }},
-        {"THE GM (SPECTRAL) COLORING ALGORITHM", [&]() {
-            GM alg(adj, p);
-            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }},
-        {"THE GM PREFETCH VARIANT", [&]() {
-            GM_prefetch alg(adj, p);
-            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }},
-        {"THE GM LOCKFREE PHASE2 VARIANT", [&]() {
-            GM_lockfree_Phase2 alg(adj, p);
-            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }},
-        {"THE GM OPTIMIZED MEX VARIANT", [&]() {
-            GM_optimized_mex alg(adj, p);
-            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }},
-        {"THE GM BALANCE EDGES VARIANT", [&]() {
-            GM_balance_edges alg(adj, p);
-            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }},
-        {"THE GM ITERATIVE ALGORITHM", [&]() {
-            GM_iterative alg(adj, p);
-            return AlgorithmResult{alg.getNoOfColors(), alg.get_color(), true};
-        }},
+        // {"THE WELSH POWEL COLORING ALGORITHM", [&]() {
+        //     welshPowelColoring alg(adj);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
+        // {"THE GM (SPECTRAL) COLORING ALGORITHM", [&]() {
+        //     GM alg(adj, p);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
+        // {"THE GM PREFETCH VARIANT", [&]() {
+        //     GM_prefetch alg(adj, p);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
+        // {"THE GM LOCKFREE PHASE2 VARIANT", [&]() {
+        //     GM_lockfree_Phase2 alg(adj, p);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
+        // {"THE GM OPTIMIZED MEX VARIANT", [&]() {
+        //     GM_optimized_mex alg(adj, p);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
+        // {"THE GM BALANCE EDGES VARIANT", [&]() {
+        //     GM_balance_edges alg(adj, p);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
+        // {"THE GM ITERATIVE ALGORITHM", [&]() {
+        //     GM_iterative alg(adj, p);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.get_color(), true};
+        // }},
         {"THE GM ITERATIVE CSR ALGORITHM", [&]() {
             GM_iterative_CSR alg(adj, p);
             return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
@@ -117,10 +120,22 @@ int main() {
             GM_sequential alg(adj);
             return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
         }},
-        {"THE GM RANDOM PHASE1 ALGORITHM", [&]() {
-            GM_random_Phase1 alg(adj, p);
+        // {"THE GM RANDOM PHASE1 ALGORITHM", [&]() {
+        //     GM_random_Phase1 alg(adj, p);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
+        {"THE EDGELOCK NAIVE ALGORITHM", [&]() {
+            edgeLock_Naive alg(adj, p);
             return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }}
+        }},
+        // {"THE EDGELOCK PORTABLE ALGORITHM", [&]() {
+        //     edgeLock_Portable alg(adj, p);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
+        // {"THE EDGELOCK CSR ALGORITHM", [&]() {
+        //     edgeLock_CSR alg(adj, p);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }}
     };
 
     for (const auto& job : jobs) {
