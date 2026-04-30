@@ -63,7 +63,7 @@ int main() {
 
     // --- GM VARIANTS ---
     RUN_ALGO("GM_Classic", GM algo(adj, p))
-    RUN_ALGO("GM_LockFree", GM_lockfree algo(adj, p))
+    // RUN_ALGO("GM_LockFree", GM_lockfree algo(adj, p))
     RUN_ALGO("GM_Iterative", GM_iterative algo(adj, p))
     RUN_ALGO("GM_Iterative_CSR", GM_iterative_csr algo(adj, p))
 
