@@ -9,7 +9,6 @@ using namespace std;
 class edgeLock_CSR {
 private:
     os_unfair_lock edge_lock = OS_UNFAIR_LOCK_INIT;
-edgeLock_CSR
     int n;
     int p;
     int noOfColors;
@@ -36,7 +35,7 @@ edgeLock_CSR
                 forbidden_colors.resize((end - start) * 2, -1);
             }
 
-            bool isCrossEdge = false;edgeLock_CSR
+            bool isCrossEdge = false;
 
             // Step 1 & 2: Single pass over contiguous neighbors
             for (int e = start; e < end; e++) {
