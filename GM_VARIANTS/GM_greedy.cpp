@@ -18,6 +18,8 @@ private:
 
     int noOfColors; // The number of colors used to color the graph
 
+    vector<int> color;
+
     // a function which colors colors the graph
     // this is run in parallel by the threads
     void pseudo_color(int ind1, int ind2, vector<int> &color){
@@ -57,7 +59,7 @@ private:
 
     void run_GM(){
         // define a vector of colors
-        vector<int> color(n, -1);
+        color.assign(n, -1);
 
         // PHASE 1 - pseudo graph coloring
 
@@ -140,20 +142,105 @@ private:
         noOfColors++;
     }
 
+    void run_sequential_GM(){
+        // define a vector of colors
+        vector<int> color(n, -1);
+
+        // PHASE 1 - pseudo graph coloring
+
+        int cur_ind = 0;
+        int extra_vertices = n%p;
+
+        for(int i = 0 ; i < p; i++){
+            int ind1 = cur_ind;
+            int ind2 = cur_ind + n/p - 1;
+            if(extra_vertices){
+                extra_vertices--;
+                ind2++;
+            }
+            pseudo_color(ind1, ind2, color);
+
+            // update the current index
+            cur_ind = ind2 + 1;
+        }
+
+        // we will not have any wrong colors
+
+        // but to be consistent, do this phase
+        // PHASE 2 - check wrong colors
+        
+        // we have a set storing the vertices who have same colors adjacent to each other
+        cur_ind = 0;
+        extra_vertices = n%p;
+        set<int> clashing;
+        for(int i = 0 ; i < p ; i++){
+            int ind1 = cur_ind;
+            int ind2 = cur_ind + n/p - 1;
+            if(extra_vertices){
+                extra_vertices--;
+                ind2++;
+            }
+            check_clash(ind1, ind2, color, clashing);
+
+            // update the current index
+            cur_ind = ind2 + 1;
+        }
+
+        // again will not be needed
+        // but just kept for a sanity check
+
+        // PHASE 3 - color the vertices sequentially
+        for(int u : clashing){
+            vector<int> nbr_colors;
+            for(int nbr : adj[u]){
+                nbr_colors.push_back(color[nbr]);
+            }
+            sort(nbr_colors.begin(), nbr_colors.end());
+            int mex = 0;
+            for(int i : nbr_colors){
+                if(mex==i){
+                    mex++;
+                }else if(mex < i){
+                    break;
+                }
+            }
+
+            color[u] = mex;
+
+        }
+
+        // we need to find the number of distinct colors used
+        noOfColors = 0;
+        for(int i = 0 ; i < n ; i++){
+            noOfColors = max(noOfColors, color[i]);
+        }
+
+        // Since the color values are 0 indexes, the noOfColors is 1 + max value used in color array
+        noOfColors++;
+    }
+
 public:
 
     // Constructor
     // give the graph and number of processes
+    // p is 1 for sequential
     GM(vector<vector<int>> adj, int p){
         n = adj.size();
         this->adj = adj;
         this->p = p;
 
-        run_GM();
+        if(p != 1)
+            run_GM();
+        else if(p==1)
+            run_sequential_GM();
     }
 
     int getNoOfColors(){
         return noOfColors;
+    }
+
+    vector<int> return_color() {
+        return color;
     }
 
 };
