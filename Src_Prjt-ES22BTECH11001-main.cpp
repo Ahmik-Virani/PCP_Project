@@ -8,28 +8,28 @@
 using namespace std;
 using namespace chrono;
 
-#include "generateGraph.cpp"
-#include "checkColor.cpp"
+#include "Helpers/Src_Prjt-ES22BTECH11001-generateGraph.cpp"
+#include "Helpers/Src_Prjt-ES22BTECH11001-checkColor.cpp"
 
-#include "Baselines/greedyColoring.cpp"
-#include "Baselines/welshPowelColoring.cpp"
-#include "Baselines/DSATUR.cpp"
-#include "Baselines/mColoring.cpp"
+#include "Baselines/Src_Prjt-ES22BTECH11001-greedyColoring.cpp"
+#include "Baselines/Src_Prjt-ES22BTECH11001-welshPowelColoring.cpp"
+#include "Baselines/Src_Prjt-ES22BTECH11001-DSATUR.cpp"
+#include "Baselines/Src_Prjt-ES22BTECH11001-mColoring.cpp"
 
-#include "GM_VARIANTS/GM_greedy.cpp"
-#include "GM_VARIANTS/GM_prefetch.cpp"
-#include "GM_VARIANTS/GM_lockfree_Phase2.cpp"
-#include "GM_VARIANTS/GM_optimized_mex.cpp"
-#include "GM_VARIANTS/GM_balance_edges.cpp"
+#include "GM_VARIANTS/Src_Prjt-ES22BTECH11001-GM_greedy.cpp"
+#include "GM_VARIANTS/Src_Prjt-ES22BTECH11001-GM_prefetch.cpp"
+#include "GM_VARIANTS/Src_Prjt-ES22BTECH11001-GM_lockfree_Phase2.cpp"
+#include "GM_VARIANTS/Src_Prjt-ES22BTECH11001-GM_optimized_mex.cpp"
+#include "GM_VARIANTS/Src_Prjt-ES22BTECH11001-GM_balance_edges.cpp"
 
-#include "IterativeCSR/GM_iterative.cpp"
-#include "IterativeCSR/GM_iterative_CSR.cpp"
-#include "IterativeCSR/GM_sequential.cpp"
+#include "IterativeCSR/Src_Prjt-ES22BTECH11001-GM_iterative.cpp"
+#include "IterativeCSR/Src_Prjt-ES22BTECH11001-GM_iterative_CSR.cpp"
+#include "IterativeCSR/Src_Prjt-ES22BTECH11001-GM_sequential.cpp"
 
-#include "Novel/GM_random_Phase1.cpp"
-#include "Novel/edgeLock_Naive.cpp"
-#include "Novel/edgeLock_Portable.cpp"
-#include "Novel/edgeLock_CSR.cpp"
+#include "Novel/Src_Prjt-ES22BTECH11001-GM_random_Phase1.cpp"
+// #include "Novel/Src_Prjt-ES22BTECH11001-edgeLock_Naive.cpp"
+#include "Novel/Src_Prjt-ES22BTECH11001-edgeLock_Portable.cpp"
+// #include "Novel/Src_Prjt-ES22BTECH11001-edgeLock_CSR.cpp"
 
 struct AlgorithmResult {
     int colorCount;
@@ -80,10 +80,10 @@ int main() {
     };
 
     vector<AlgorithmJob> jobs = {
-        {"THE GREEDY COLORING ALGORITHM", [&]() {
-            greedyColoring alg(adj);
-            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }},
+        // {"THE GREEDY COLORING ALGORITHM", [&]() {
+        //     greedyColoring alg(adj);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
         // {"THE WELSH POWEL COLORING ALGORITHM", [&]() {
         //     welshPowelColoring alg(adj);
         //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
@@ -112,26 +112,26 @@ int main() {
         //     GM_iterative alg(adj, p);
         //     return AlgorithmResult{alg.getNoOfColors(), alg.get_color(), true};
         // }},
-        {"THE GM ITERATIVE CSR ALGORITHM", [&]() {
-            GM_iterative_CSR alg(adj, p);
-            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }},
-        {"THE GM SEQUENTIAL CSR ALGORITHM", [&]() {
-            GM_sequential alg(adj);
-            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }},
+        // {"THE GM ITERATIVE CSR ALGORITHM", [&]() {
+            // GM_iterative_CSR alg(adj, p);
+            // return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
+        // {"THE GM SEQUENTIAL CSR ALGORITHM", [&]() {
+        //     GM_sequential alg(adj);
+        //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        // }},
         // {"THE GM RANDOM PHASE1 ALGORITHM", [&]() {
         //     GM_random_Phase1 alg(adj, p);
         //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
         // }},
-        {"THE EDGELOCK NAIVE ALGORITHM", [&]() {
-            edgeLock_Naive alg(adj, p);
-            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
-        }},
-        // {"THE EDGELOCK PORTABLE ALGORITHM", [&]() {
-        //     edgeLock_Portable alg(adj, p);
+        // {"THE EDGELOCK NAIVE ALGORITHM", [&]() {
+        //     edgeLock_Naive alg(adj, p);
         //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
         // }},
+        {"THE EDGELOCK PORTABLE ALGORITHM", [&]() {
+            edgeLock_Portable alg(adj, p);
+            return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
+        }},
         // {"THE EDGELOCK CSR ALGORITHM", [&]() {
         //     edgeLock_CSR alg(adj, p);
         //     return AlgorithmResult{alg.getNoOfColors(), alg.return_color(), true};
