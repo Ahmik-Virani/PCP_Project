@@ -1,13 +1,19 @@
 #include <iostream>
-#include <chrono> // Added for execution timing
+#include <fstream>
+#include <chrono>
+#include <string>
+#include <iomanip>
+
 using namespace std;
-using namespace std::chrono; // Added for cleaner timing code
+using namespace std::chrono;
 
 #include "generateGraphOpt.cpp"
+#include "./GM_VARIANTS/GM_sequential.cpp"
 #include "./GM_VARIANTS/GM_greedy.cpp"
 #include "./GM_VARIANTS/GM_greedy_lockfree.cpp"
 #include "./GM_VARIANTS/GM_iterative.cpp"
 #include "./GM_VARIANTS/GM_iterative_csr.cpp"
+#include "./JP_VARIANTS/JP_sequential.cpp"
 #include "./JP_VARIANTS/JP_classic.cpp"
 #include "./JP_VARIANTS/JP_optimized_csr.cpp"
 #include "./JP_VARIANTS/JP_persistent_csr.cpp"
@@ -16,103 +22,55 @@ using namespace std::chrono; // Added for cleaner timing code
 #include "mColoring.cpp"
 #include "DSATUR.cpp"
 
-int main(){
-    // specify the number of vertices and probability of edge
-    int n = 1000000;
-    double prob = 0.0001;
-    int p = 8;
+int main() {
+    int n;
+    double prob;
+    int p;
 
-    // generate a graph with 'n' vertices and probability of edge 'prob'
+    // 1. Read parameters from input file
+    ifstream infile("params.txt");
+    if (!infile) {
+        cerr << "Error: Could not open params.txt. Please create it with 'n prob p' format.\n";
+        return 1;
+    }
+    infile >> n >> prob >> p;
+    infile.close();
+
+    // 2. Generate Graph
+    // Uncomment this line to see generation time in terminal, but keep it out of the CSV parser
+    // cerr << "Generating graph with n=" << n << ", prob=" << prob << ", threads=" << p << "...\n";
     generateGraph g(n, prob);
     vector<vector<int>> adj = g.getGraph();
 
-    for(int i = 0 ; i < 30 ; i++) cout << "*";
-    cout << "\nRUNNING THE GREEDY COLORING ALGORITHM\n";
-    auto start = steady_clock::now();
-    greedyColoring greedy_approach(adj);
-    auto stop = steady_clock::now();
-    cout << "The number of colors: " << greedy_approach.getNoOfColors() << "\n";
-    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
+    // 3. Print CSV Header (Python will read this)
+    cout << "Algorithm,Colors,Time_us\n";
 
-    for(int i = 0 ; i < 30 ; i++) cout << "*";
-    cout << "\nRUNNING THE WELSH POWEL COLORING ALGORITHM\n";
-    start = steady_clock::now();
-    welshPowelColoring welsh_powel_approach(adj);
-    stop = steady_clock::now();
-    cout << "The number of colors: " << welsh_powel_approach.getNoOfColors() << "\n";
-    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
+    // Macro for clean, repeatable timing and CSV output
+    #define RUN_ALGO(NAME, CLASS_INIT) \
+        { \
+            auto start = steady_clock::now(); \
+            CLASS_INIT; \
+            auto stop = steady_clock::now(); \
+            cout << NAME << "," << algo.getNoOfColors() << "," \
+                 << duration_cast<microseconds>(stop - start).count() << "\n"; \
+        }
 
-    // for(int i = 0 ; i < 30 ; i++) cout << "*";
-    // cout << "\nRUNNING THE BACKTRACKING (BRUTE FORCE) COLORING ALGORITHM\n";
-    // start = steady_clock::now();
-    // minColor brute_force_approach(adj, welsh_powel_approach.getNoOfColors());
-    // stop = steady_clock::now();
-    // cout << "The number of colors: " << brute_force_approach.getNoOfColors() << "\n";
-    // cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
+    // --- SEQUENTIAL BASELINES ---
+    RUN_ALGO("Greedy", greedyColoring algo(adj))
+    RUN_ALGO("Welsh-Powell", welshPowelColoring algo(adj))
+    RUN_ALGO("PureGreedy_CSR", PureGreedy_csr algo(adj))
+    RUN_ALGO("JP_Sequential", JP_sequential_csr algo(adj))
 
-    // for(int i = 0 ; i < 30 ; i++) cout << "*";
-    // cout << "\nRUNNING THE DSATUR COLORING ALGORITHM\n";
-    // start = steady_clock::now();
-    // DSATUR DSATUR_approach(adj, welsh_powel_approach.getNoOfColors());
-    // stop = steady_clock::now();
-    // cout << "The number of colors: " << DSATUR_approach.getNoOfColors() << "\n";
-    // cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
+    // --- GM VARIANTS ---
+    RUN_ALGO("GM_Classic", GM algo(adj, p))
+    RUN_ALGO("GM_LockFree", GM_lockfree algo(adj, p))
+    RUN_ALGO("GM_Iterative", GM_iterative algo(adj, p))
+    RUN_ALGO("GM_Iterative_CSR", GM_iterative_csr algo(adj, p))
 
-    for(int i = 0 ; i < 30 ; i++) cout << "*";
-    cout << "\nRUNNING THE GM (SPECTRAL) COLORING ALGORITHM\n";
-    start = steady_clock::now();
-    GM GM_parallel_approach(adj, p);
-    stop = steady_clock::now();
-    cout << "The number of colors: " << GM_parallel_approach.getNoOfColors() << "\n";
-    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
-
-    for(int i = 0 ; i < 30 ; i++) cout << "*";
-    cout << "\nRUNNING THE GM LOCK-FREE COLORING ALGORITHM\n";
-    start = steady_clock::now();
-    GM_lockfree GM_lockfree_approach(adj, p); 
-    stop = steady_clock::now();
-    cout << "The number of colors: " << GM_lockfree_approach.getNoOfColors() << "\n";
-    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
-
-    for(int i = 0 ; i < 30 ; i++) cout << "*";
-    cout << "\nRUNNING THE GM ITERATIVE COLORING ALGORITHM\n";
-    start = steady_clock::now();
-    GM_iterative GM_iterative_approach(adj, p); 
-    stop = steady_clock::now();
-    cout << "The number of colors: " << GM_iterative_approach.getNoOfColors() << "\n";
-    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
-
-    for(int i = 0 ; i < 30 ; i++) cout << "*";
-    cout << "\nRUNNING THE GM ITERATIVE CSR ALGORITHM\n";
-    start = steady_clock::now();
-    GM_iterative_csr GM_csr_approach(adj, p);
-    stop = steady_clock::now();
-    cout << "The number of colors: " << GM_csr_approach.getNoOfColors() << "\n";
-    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
-
-    for(int i = 0 ; i < 30 ; i++) cout << "*";
-    cout << "\nRUNNING THE CLASSIC JP ALGORITHM\n";
-    start = steady_clock::now();
-    JP_classic JP_approach(adj, p);
-    stop = steady_clock::now();
-    cout << "The number of colors: " << JP_approach.getNoOfColors() << "\n";
-    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
-
-    for(int i = 0 ; i < 30 ; i++) cout << "*";
-    cout << "\nRUNNING THE OPTIMIZED JP ALGORITHM WITH CSR\n";
-    start = steady_clock::now();
-    JP_optimized_csr JP_csr_approach(adj, p);
-    stop = steady_clock::now();
-    cout << "The number of colors: " << JP_csr_approach.getNoOfColors() << "\n";
-    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
-
-    for(int i = 0 ; i < 30 ; i++) cout << "*";
-    cout << "\nRUNNING THE PERSISTENT JP ALGORITHM WITH CSR\n";
-    start = steady_clock::now();
-    JP_persistent_csr JP_persistent_csr_approach(adj, p);
-    stop = steady_clock::now();
-    cout << "The number of colors: " << JP_persistent_csr_approach.getNoOfColors() << "\n";
-    cout << "Time taken: " << duration_cast<microseconds>(stop - start).count() << " microseconds\n\n";
+    // --- JP VARIANTS ---
+    RUN_ALGO("JP_Classic", JP_classic algo(adj, p))
+    RUN_ALGO("JP_Optimized_CSR", JP_optimized_csr algo(adj, p))
+    RUN_ALGO("JP_Persistent_CSR", JP_persistent_csr algo(adj, p))
 
     return 0;
 }
