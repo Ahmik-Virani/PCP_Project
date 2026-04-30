@@ -1,3 +1,5 @@
+// classic parallel GM implementation
+
 #include<iostream>
 #include<vector>
 #include<thread>
